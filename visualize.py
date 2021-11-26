@@ -17,12 +17,12 @@ for data_file in data_files:
         print(f'<h2>{data_type} - {data_version} - {dist}</h2>')
         print('<h3>only in repo</h3>')
         print('<ul>')
-        for entry in report['repo_only']:
+        for entry in sorted(report['repo_only']):
             print(f'<li>{entry}</li>')
         print('</ul>')
         print('<h3>only in git</h3>')
         print('<ul>')
-        for entry in report['git_only']:
+        for entry in sorted(report['git_only']):
             print(f'<li>{entry}</li>')
         print('</ul>')
         print('</div>')
