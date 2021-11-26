@@ -3,7 +3,7 @@
 import json
 import pathlib
 
-data_files = pathlib.Path('data/').glob('*.json')
+data_files = sorted(pathlib.Path('data/').glob('*.json'))
 
 for data_file in data_files:
     data_type, data_version = data_file.stem.split('-', 1)
