@@ -1,0 +1,35 @@
+name: docs
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron:  '30 5,17 * * *'
+  push:
+    branches:
+      - develop
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: configure git
+        run: |
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@bots.github.com"
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+      - name: Build docs
+        run: make index.html
+      - name: commit docs
+        run: |
+          mv index.html index.html.new
+          git checkout gh-pages
+          mv index.html.new index.html
+          git add index.html
+          git commit -m "update report" || true
+      - name: push docs
+        run: git push origin gh-pages
