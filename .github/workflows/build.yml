@@ -8,30 +8,37 @@ on:
     branches:
       - develop
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
   report:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v3
-      - name: configure git
-        run: |
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_ACTOR}@bots.github.com"
-          git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
       - name: Set up Python
-        uses: actions/setup-python@v4.3.0
+        uses: actions/setup-python@v4
         with:
           python-version: "3.8"
       - name: Set up dependencies
         run: pip install -r requirements.txt
       - name: Build docs
         run: make index.html
-      - name: commit docs
-        run: |
-          mv index.html index.html.new
-          git checkout gh-pages
-          mv index.html.new index.html
-          git add index.html
-          git commit -m "update report" || true
-      - name: push docs
-        run: git push origin gh-pages
+      - name: Setup Pages
+        uses: actions/configure-pages@v2
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: '.'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
